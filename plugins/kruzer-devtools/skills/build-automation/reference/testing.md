@@ -14,13 +14,58 @@ Tests are written for **use cases** and **data transformations** only. Automatio
 
 ## Stack
 
-From ADR-0001 — already configured in the project `package.json`:
-
 | Tool | Purpose |
 |---|---|
 | Jest 29 + `@swc/jest` | Test runner with fast TypeScript compilation |
 | `jest.fn()` / `jest.Mocked<T>` | Type-safe mocking of datasource dependencies |
 | `@faker-js/faker` + Factory pattern | Realistic, maintainable test data |
+
+Install as devDependencies:
+
+```bash
+npm install --save-dev jest@29 @swc/jest@0.2 @swc/core@1.7 @types/jest@29 @faker-js/faker@8
+```
+
+## Jest Configuration
+
+Add the following to `package.json`. The `@swc/jest` transform **must** specify `jsc.target` explicitly — the default auto-detection can resolve to `es2023`, which `@swc/core` does not support, causing the test suite to fail to run.
+
+`collectCoverageFrom` is scoped to `src/domain/**` because datasources are infrastructure wrappers and are not unit tested. Including them would drag coverage below the thresholds unfairly.
+
+```json
+"scripts": {
+  "build": "tsc -p .",
+  "test": "jest",
+  "test:cov": "jest --coverage"
+},
+"jest": {
+  "transform": {
+    "^.+\\.(t|j)s$": ["@swc/jest", {
+      "jsc": {
+        "target": "es2022",
+        "parser": { "syntax": "typescript", "tsx": false }
+      },
+      "module": { "type": "commonjs" }
+    }]
+  },
+  "testRegex": ".*\\.spec\\.ts$",
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "coverageDirectory": "./coverage",
+  "collectCoverageFrom": [
+    "src/domain/**/*.(t|j)s"
+  ],
+  "coverageThreshold": {
+    "global": {
+      "statements": 80,
+      "functions": 80,
+      "lines": 80,
+      "branches": 75
+    }
+  }
+}
+```
 
 ## File Structure
 
@@ -228,7 +273,7 @@ describe('vtexOrderToOmsOrder()', () => {
 
 ## Coverage Thresholds
 
-From ADR-0001 — applied to the unit test suite (`npm run test:cov`):
+Applied to the unit test suite via `npm run test:cov`:
 
 | Metric | Minimum |
 |---|---|
@@ -239,9 +284,13 @@ From ADR-0001 — applied to the unit test suite (`npm run test:cov`):
 
 Coverage only grows — no PR may reduce global coverage relative to the base branch.
 
+> **Config key:** use `coverageThreshold` (singular). `coverageThresholds` (plural) is silently ignored by Jest with a validation warning, so thresholds will never be enforced.
+
 ## Key Points
 
 - `jest.resetAllMocks()` in `afterEach` — resets both call history and implementation. Never use `clearAllMocks` (it keeps mock implementations active, causing non-deterministic failures that vary by test execution order).
 - Mock the datasource instance methods, not the `@kruzer/idk` classes — the use case never touches IDK directly.
 - Each `it` creates its own data via factories — never share mutable state between tests.
 - `beforeEach` is for infrastructure setup (instantiating the use case and mocks). Never create test data in `beforeEach`.
+- Always pass explicit options to `@swc/jest` in the transform — do not rely on auto-detection. Without them, `@swc/jest@0.2.x` may infer `es2023` as the target, which `@swc/core` does not support, causing the entire test suite to fail to run with a deserialization error.
+- `collectCoverageFrom` must point to `src/domain/**` only. Pointing to `src/**` includes datasource wrappers, which are intentionally untested, pulling statements/functions/lines coverage below the 80% threshold.
