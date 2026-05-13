@@ -24,7 +24,7 @@ claude
 2. Add the Kruzer marketplace to Claude Code:
 
 ```bash
-/plugin marketplace add kruzer/kruzer-agent-skills
+/plugin marketplace add kruzer-corp/kruzer-agent-skills
 ```
 
 3. Install the plugin:
