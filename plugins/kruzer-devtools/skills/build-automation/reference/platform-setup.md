@@ -1,5 +1,40 @@
 # Platform Setup — Prerequisites Before Writing Code
 
+## Step 1 — Create the Repository on the Platform
+
+Before writing any code, the project repository must be created via the Kruzer DevTools platform. **Do not create a blank repository manually.**
+
+1. Access the Kruzer platform and go to **Repositories**
+2. Click **Novo Repositório** and provide a project name
+3. Confirm — the platform automatically provisions a GitHub repository with the standard template pre-configured:
+   - Folder structure (`automations/`, `functions/`, `data-transformations/`)
+   - TypeScript configuration (`tsconfig.json`)
+   - Project dependencies (`package.json` with `@kruzer/idk` already included)
+
+4. Clone the provisioned repository and install dependencies:
+
+```bash
+git clone https://github.com/your-org/project-name.git
+cd project-name
+npm install
+```
+
+Only after this step does it make sense to create automation files, datasources, or use cases. The `package.json` and `tsconfig.json` come from the platform template — do not create them from scratch.
+
+---
+
+## Step 2 — Configure the CLI
+
+```bash
+krz configure     # set the iPaaS host (run once)
+krz login         # authenticate
+krz select tenant # select the development tenant
+```
+
+---
+
+## Step 3 — Configure Connectors and Credentials
+
 Before writing any datasource or automation code, the following must already be configured on the Kruzer iPaaS platform. Code that references a connector or alias that does not exist on the platform will fail at runtime with no compile-time warning.
 
 ## Required Setup Per Datasource Type

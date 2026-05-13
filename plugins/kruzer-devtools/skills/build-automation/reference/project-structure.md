@@ -2,6 +2,8 @@
 
 ## Standard Folder Layout
 
+The repository is provisioned by the Kruzer platform from a standard template — `package.json`, `tsconfig.json`, and the base folder structure are created automatically. Never start from a blank repository.
+
 ```
 meu-projeto/
 ├── automations/                    # Entrypoints executed by the Kruzer platform

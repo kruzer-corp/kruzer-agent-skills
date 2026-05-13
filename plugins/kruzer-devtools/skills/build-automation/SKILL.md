@@ -39,6 +39,24 @@ Load this skill whenever you are:
 
 ---
 
+## Repository Validation — Before Any Implementation
+
+Before writing any code, run this single validation command:
+
+```bash
+[ -f package.json ] && grep -q '"@kruzer/idk"' package.json && [ -f tsconfig.json ] && [ -d automations ] && echo "KRUZER_REPO_VALID" || echo "KRUZER_REPO_INVALID"
+```
+
+**If the output is `KRUZER_REPO_VALID`:** proceed normally.
+
+**If the output is `KRUZER_REPO_INVALID`:** stop immediately and inform the user:
+
+> "This directory does not appear to be a Kruzer DevTools repository. The Kruzer platform must provision the repository before development begins — it creates the standard folder structure, `tsconfig.json`, and `package.json` with `@kruzer/idk` pre-configured. See https://kruzer.ai/docs/devtools/quickstart for the setup steps."
+
+Do not attempt to create `package.json`, `tsconfig.json`, or the folder structure manually. These files must come from the platform template.
+
+---
+
 ## Anti-Patterns — Never Do These
 
 | Anti-pattern | Why it is wrong |
@@ -125,7 +143,7 @@ Read these files for detailed patterns and canonical code examples. Each covers 
 | `reference/mysql-datasource.md` | Using `MySqlDataSource` or `MsSqlDataSource` from `@kruzer/idk`: `query()`, `:variableName` bind syntax, pagination |
 | `reference/oracle-datasource.md` | Using `OracleDataSource` from `@kruzer/idk`: `query()`, `{ val: value }` bind syntax — critical difference from MySQL |
 | `reference/sap-rfc-datasource.md` | Using `SapRFCDatasource` from `@kruzer/idk`: `call()`, IMPORT/TABLES parameters, credentials |
-| `reference/platform-setup.md` | **Read before writing any datasource code.** What must be pre-configured on the platform (connectors, aliases, credentials per tenant), and how to ask the user for connector/alias names |
+| `reference/platform-setup.md` | **Read first when starting any new project or writing datasource code.** How to create and clone the repository via the platform, CLI setup, and what connectors/aliases/credentials must be pre-configured before code will work |
 | `reference/multi-tenancy.md` | Understanding how tenant credential isolation works, the optional tenant constructor parameter, and local development with `krz select tenant` |
 | `reference/deploy.md` | How deployment works (build + commit-triggered), package dependency constraints, and branch configuration |
 | `reference/testing.md` | Writing unit tests for use cases and data transformations: stack (Jest + `@swc/jest`), mocking pattern, AAA, factory pattern, coverage thresholds |
