@@ -2,6 +2,8 @@
 
 ## Standard Folder Layout
 
+The repository is provisioned by the Kruzer platform from a standard template — see `platform-setup.md` (Step 1) for the provisioning flow. Never start from a blank repository.
+
 ```
 meu-projeto/
 ├── automations/                    # Entrypoints executed by the Kruzer platform

@@ -1,5 +1,60 @@
 # Platform Setup — Prerequisites Before Writing Code
 
+Steps to validate the repository, provision the project, configure the CLI, and set up connectors and credentials on the Kruzer iPaaS platform before any code will run.
+
+## Step 0 — Validate the Repository
+
+Before any other step, confirm the current directory is a Kruzer-provisioned repository:
+
+```bash
+[ -f package.json ] && grep -q '"@kruzer/idk"' package.json && [ -f tsconfig.json ] && [ -d automations ] && echo "KRUZER_REPO_VALID" || echo "KRUZER_REPO_INVALID"
+```
+
+**If the output is `KRUZER_REPO_VALID`:** proceed to implementation.
+
+**If the output is `KRUZER_REPO_INVALID`:** stop and inform the user:
+
+> "This directory does not appear to be a Kruzer DevTools repository. The Kruzer platform must provision the repository before development begins — it creates the standard folder structure, `tsconfig.json`, and `package.json` with `@kruzer/idk` pre-configured. See https://kruzer.ai/docs/devtools/quickstart for the setup steps."
+
+Do not attempt to create `package.json`, `tsconfig.json`, or the folder structure manually. These files must come from the platform template.
+
+---
+
+## Step 1 — Create the Repository on the Platform
+
+Before writing any code, the project repository must be created via the Kruzer DevTools platform. **Do not create a blank repository manually.**
+
+1. Access the Kruzer platform and go to **Repositories**
+2. Click **New Repository** ("Novo Repositório") and provide a project name
+3. Confirm — the platform automatically provisions a GitHub repository with the standard template pre-configured:
+   - Folder structure (`automations/`, `functions/`, `data-transformations/`)
+   - TypeScript configuration (`tsconfig.json`)
+   - Project dependencies (`package.json` with `@kruzer/idk` already included)
+
+4. Clone the provisioned repository and install dependencies:
+
+```bash
+git clone <URL displayed on the platform after repository creation>
+cd project-name
+npm install
+```
+
+Only after this step does it make sense to create automation files, datasources, or use cases. The `package.json` and `tsconfig.json` come from the platform template — do not create them from scratch.
+
+---
+
+## Step 2 — Configure the CLI
+
+```bash
+krz configure     # set the iPaaS host (run once)
+krz login         # authenticate
+krz select tenant # select the development tenant
+```
+
+---
+
+## Step 3 — Configure Connectors and Credentials
+
 Before writing any datasource or automation code, the following must already be configured on the Kruzer iPaaS platform. Code that references a connector or alias that does not exist on the platform will fail at runtime with no compile-time warning.
 
 ## Required Setup Per Datasource Type
