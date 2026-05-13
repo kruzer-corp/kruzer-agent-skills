@@ -15,7 +15,8 @@ export default class MySystemDatasource {
   }
 
   async someOperation(param: string): Promise<SomeType> {
-    return this.client.request("alias-configured-on-platform", { urlParams: { param } });
+    const response = await this.client.request("alias-configured-on-platform", { urlParams: { param } });
+    return response.data; // always unwrap the platform envelope
   }
 }
 ```
@@ -45,12 +46,13 @@ export default class VtexOrdersDatasource {
 
   async getOrderById(orderId: string): Promise<VtexOrderDetails> {
     this.logger.info("Fetching VTEX order", { orderId });
-    return this.client.request("getOrderById", { urlParams: { orderId } });
+    const response = await this.client.request("getOrderById", { urlParams: { orderId } });
+    return response.data; // unwrap platform envelope
   }
 
   async changeOrder(orderId: string, body: ChangeOrderBody): Promise<void> {
     this.logger.info("Changing VTEX order", { orderId });
-    return this.client.request("changeOrder", {
+    await this.client.request("changeOrder", {
       urlParams: { changeOrderId: orderId },
       body
     });
