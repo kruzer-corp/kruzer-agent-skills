@@ -1,0 +1,11 @@
+{
+  "name": "kruzer",
+  "owner": { "name": "Kruzer" },
+  "metadata": {
+    "description": "Skills para desenvolvimento de integrações na plataforma Kruzer DevTools",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    { "name": "kruzer-devtools", "source": "./plugins/kruzer-devtools" }
+  ]
+}

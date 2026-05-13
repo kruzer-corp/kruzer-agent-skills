@@ -1,0 +1,7 @@
+{
+  "name": "kruzer-devtools",
+  "description": "Skills para criação de automations e uso do @kruzer/idk na plataforma Kruzer iPaaS",
+  "version": "1.0.0",
+  "author": "Kruzer",
+  "keywords": ["kruzer", "idk", "automation", "integration", "typescript", "ipaas"]
+}
