@@ -39,9 +39,37 @@ Load this skill whenever you are:
 
 ---
 
-## Repository Validation — Before Any Implementation
+## Before Writing Any Code
 
-Before writing any code, validate the current directory. See `reference/platform-setup.md` — Step 0.
+Run these steps in order. Do not skip any of them.
+
+**1. Validate the repository**
+
+```bash
+[ -f package.json ] && grep -q '"@kruzer/idk"' package.json && [ -f tsconfig.json ] && [ -d automations ] && echo "KRUZER_REPO_VALID" || echo "KRUZER_REPO_INVALID"
+```
+
+If the output is `KRUZER_REPO_INVALID`, stop and tell the user. See `reference/platform-setup.md` — Step 0.
+
+**2. Install dependencies**
+
+```bash
+npm install
+```
+
+Run this every time before writing code. The `node_modules/` directory may be absent (fresh clone) or stale. Always install before editing — TypeScript compilation and local test runs depend on it.
+
+---
+
+## After Implementing
+
+Once all files are written, **always** run the build to verify the TypeScript compiles:
+
+```bash
+npm run build
+```
+
+A build failure means the code will also fail on the platform at deploy time. Fix all compilation errors before considering the task complete.
 
 ---
 
@@ -133,5 +161,5 @@ Read these files for detailed patterns and canonical code examples. Each covers 
 | `reference/sap-rfc-datasource.md` | Using `SapRFCDatasource` from `@kruzer/idk`: `call()`, IMPORT/TABLES parameters, credentials |
 | `reference/platform-setup.md` | **Read first when starting any new project or writing datasource code.** How to create and clone the repository via the platform, CLI setup, and what connectors/aliases/credentials must be pre-configured before code will work |
 | `reference/multi-tenancy.md` | Understanding how tenant credential isolation works, the optional tenant constructor parameter, and local development with `krz select tenant` |
-| `reference/deploy.md` | How deployment works (build + commit-triggered), package dependency constraints, and branch configuration |
+| `reference/deploy.md` | After finishing any implementation (run `npm run build` before committing), understanding how deployment works (build + commit-triggered), package dependency constraints, and branch configuration |
 | `reference/testing.md` | Writing unit tests for use cases and data transformations: stack (Jest + `@swc/jest`), mocking pattern, AAA, factory pattern, coverage thresholds |
