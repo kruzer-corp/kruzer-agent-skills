@@ -10,6 +10,31 @@ description: >
 
 # build-automation Skill
 
+## MANDATORY SETUP — Run this before anything else
+
+Before reading any other section, before planning, before writing a single line of code — run:
+
+```bash
+[ -f package.json ] && grep -q '"@kruzer/idk"' package.json && [ -f tsconfig.json ] && [ -d automations ] && echo "KRUZER_REPO_VALID" || echo "KRUZER_REPO_INVALID"
+```
+
+- If the output is `KRUZER_REPO_INVALID`: stop immediately and tell the user. See `reference/platform-setup.md` — Step 0.
+- If the output is `KRUZER_REPO_VALID`: check whether `node_modules` exists.
+
+```bash
+[ -d node_modules ] && echo "DEPS_OK" || echo "DEPS_MISSING"
+```
+
+If the output is `DEPS_MISSING`, run `npm install` before doing anything else:
+
+```bash
+npm install
+```
+
+Do not create or edit any file until dependencies are confirmed present.
+
+---
+
 ## Available MCP Tools
 
 Two MCP integrations are available to assist development. Use them proactively instead of guessing or asking unnecessarily.
@@ -39,28 +64,6 @@ Load this skill whenever you are:
 
 ---
 
-## Before Writing Any Code
-
-Run these steps in order. Do not skip any of them.
-
-**1. Validate the repository**
-
-```bash
-[ -f package.json ] && grep -q '"@kruzer/idk"' package.json && [ -f tsconfig.json ] && [ -d automations ] && echo "KRUZER_REPO_VALID" || echo "KRUZER_REPO_INVALID"
-```
-
-If the output is `KRUZER_REPO_INVALID`, stop and tell the user. See `reference/platform-setup.md` — Step 0.
-
-**2. Install dependencies — REQUIRED before writing any file**
-
-```bash
-npm install
-```
-
-**Do not create or edit any `.ts` file before this command completes.** The `node_modules/` directory may be absent (fresh clone) or stale. TypeScript compilation and local test runs depend on it. Skipping this step causes type errors that are invisible during coding but fail at build time.
-
----
-
 ## After Implementing — REQUIRED before reporting the task as done
 
 Once all files are written, run the build to verify the TypeScript compiles:
@@ -77,8 +80,9 @@ npm run build
 
 | Anti-pattern | Why it is wrong |
 |---|---|
-| Writing or editing any `.ts` file before running `npm install` | `node_modules/` may be absent or stale. Type errors are invisible during coding but surface at build time — wasting a full coding pass. |
+| Writing or editing any `.ts` file before confirming `node_modules` exists | If `node_modules/` is absent, type errors are invisible during coding but fail at build time. Always check first; run `npm install` only if missing. |
 | Reporting the task as done without running `npm run build` | TypeScript may compile locally but fail on deploy. The task is not complete until the build exits with code 0. |
+| `return this.client.request(...)` directly from a datasource method | `request()` returns a platform envelope `{ data: <payload> }`, not the payload itself. Callers will receive `undefined` on every field. Always `const r = await this.client.request(...); return r.data`. |
 | `import axios from "axios"` or `fetch(url)` in any file | All external HTTP calls must go through `RestDataSource` from `@kruzer/idk`. The platform handles auth, retry, and routing — bypassing it breaks multi-tenancy. |
 | Business logic in the automation file | The automation is a controller. Rules, validations, and transformations belong in the use case. |
 | A service layer between automation and use cases | There is no service layer in this architecture. Routing logic lives directly in the automation. If an automation grows too large, split it into multiple automations. |

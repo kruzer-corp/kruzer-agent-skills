@@ -16,44 +16,78 @@ The string `"connector-name-on-platform"` must match exactly the connector name 
 
 `alias` is the name of the operation (resource) configured on the connector in the platform. The code does not contain the URL — only the alias and runtime data.
 
+### Return structure
+
+`request()` always returns a platform envelope object — **not** the raw external API body:
+
+```typescript
+{
+  data: <external API response body>,  // the actual payload you want
+  // ...other platform metadata
+}
+```
+
+**Always access `.data` to get the payload.** Returning `request()` directly passes the envelope to callers, causing `undefined` on all fields. What the payload contains depends on the external API — the user must confirm the response shape before writing any mapping code.
+
+```typescript
+// WRONG — returns the envelope, not the payload
+async getPokemon(name: string) {
+  return this.client.request("get-pokemon", { urlParams: { name } });
+}
+
+// CORRECT — unwrap .data before returning
+async getPokemon(name: string): Promise<Pokemon> {
+  const response = await this.client.request("get-pokemon", { urlParams: { name } });
+  return response.data;
+}
+```
+
+### Usage examples
+
 ```typescript
 // Simple call — no dynamic data
-const products = await rest.request("list-products");
+const response = await rest.request("list-products");
+const products = response.data;
 
 // With query params
-const customers = await rest.request("list-customers", {
+const res = await rest.request("list-customers", {
   params: { page: 1, limit: 20, status: "active" }
 });
+const customers = res.data;
 
 // With request body
-const newOrder = await rest.request("create-order", {
+const res = await rest.request("create-order", {
   body: {
     customerId: 123,
     products: [{ id: 1, quantity: 2 }]
   }
 });
+const newOrder = res.data;
 
 // With URL params (path substitution)
 // Connector endpoint configured as: /products/{id}
-const details = await rest.request("product-details", {
+const res = await rest.request("product-details", {
   urlParams: { id: "12345" }
   // Resolved URL: /products/12345
 });
+const details = res.data;
 
 // With custom headers
-const result = await rest.request("protected-endpoint", {
+const res = await rest.request("protected-endpoint", {
   headers: {
     "X-Custom-Header": "value",
     "Accept-Language": "en-US"
   },
   body: { data: "example" }
 });
+const result = res.data;
 
 // Preserve the original Authorization header from the connector
-const response = await rest.request("authenticated-api", {
+const res = await rest.request("authenticated-api", {
   body: { info: "data" },
   options: { preserveAuthorizationHeader: true }
 });
+const response = res.data;
 ```
 
 ## Options Interface
@@ -85,22 +119,24 @@ export default class VtexOrdersDatasource {
   }
 
   async getOrderById(orderId: string): Promise<VtexOrderDetails> {
-    return this.client.request("getOrderById", {
+    const response = await this.client.request("getOrderById", {
       urlParams: { orderId }
     });
+    return response.data; // unwrap platform envelope
   }
 
   async changeOrder(orderId: string, body: ChangeOrderBody): Promise<void> {
-    return this.client.request("changeOrder", {
+    await this.client.request("changeOrder", {
       urlParams: { changeOrderId: orderId },
       body
     });
   }
 
   async listOrders(page: number, status: string): Promise<VtexOrderDetails[]> {
-    return this.client.request("listOrders", {
+    const response = await this.client.request("listOrders", {
       params: { page, status }
     });
+    return response.data; // unwrap platform envelope
   }
 }
 ```
@@ -124,3 +160,4 @@ For large datasets, iterate pages in a loop inside the use case until the extern
 - Never use axios, fetch, or node-http to call external APIs. Always go through `RestDataSource`.
 - The `alias` passed to `request()` must match the resource/operation name configured in the connector on the platform.
 - URL construction, authentication, **retry, and timeout are handled automatically by the platform connector** — do not implement manual retry logic on top of `RestDataSource`.
+- `request()` returns a platform envelope `{ data: <payload> }` — always unwrap `.data` inside the datasource method before returning to callers. What the payload contains is specific to each external API.
