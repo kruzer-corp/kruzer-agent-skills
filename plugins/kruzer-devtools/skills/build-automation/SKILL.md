@@ -41,19 +41,7 @@ Load this skill whenever you are:
 
 ## Repository Validation — Before Any Implementation
 
-Before writing any code, run this single validation command:
-
-```bash
-[ -f package.json ] && grep -q '"@kruzer/idk"' package.json && [ -f tsconfig.json ] && [ -d automations ] && echo "KRUZER_REPO_VALID" || echo "KRUZER_REPO_INVALID"
-```
-
-**If the output is `KRUZER_REPO_VALID`:** proceed normally.
-
-**If the output is `KRUZER_REPO_INVALID`:** stop immediately and inform the user:
-
-> "This directory does not appear to be a Kruzer DevTools repository. The Kruzer platform must provision the repository before development begins — it creates the standard folder structure, `tsconfig.json`, and `package.json` with `@kruzer/idk` pre-configured. See https://kruzer.ai/docs/devtools/quickstart for the setup steps."
-
-Do not attempt to create `package.json`, `tsconfig.json`, or the folder structure manually. These files must come from the platform template.
+Before writing any code, validate the current directory. See `reference/platform-setup.md` — Step 0.
 
 ---
 

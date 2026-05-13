@@ -1,11 +1,31 @@
 # Platform Setup — Prerequisites Before Writing Code
 
+Steps to validate the repository, provision the project, configure the CLI, and set up connectors and credentials on the Kruzer iPaaS platform before any code will run.
+
+## Step 0 — Validate the Repository
+
+Before any other step, confirm the current directory is a Kruzer-provisioned repository:
+
+```bash
+[ -f package.json ] && grep -q '"@kruzer/idk"' package.json && [ -f tsconfig.json ] && [ -d automations ] && echo "KRUZER_REPO_VALID" || echo "KRUZER_REPO_INVALID"
+```
+
+**If the output is `KRUZER_REPO_VALID`:** proceed to implementation.
+
+**If the output is `KRUZER_REPO_INVALID`:** stop and inform the user:
+
+> "This directory does not appear to be a Kruzer DevTools repository. The Kruzer platform must provision the repository before development begins — it creates the standard folder structure, `tsconfig.json`, and `package.json` with `@kruzer/idk` pre-configured. See https://kruzer.ai/docs/devtools/quickstart for the setup steps."
+
+Do not attempt to create `package.json`, `tsconfig.json`, or the folder structure manually. These files must come from the platform template.
+
+---
+
 ## Step 1 — Create the Repository on the Platform
 
 Before writing any code, the project repository must be created via the Kruzer DevTools platform. **Do not create a blank repository manually.**
 
 1. Access the Kruzer platform and go to **Repositories**
-2. Click **Novo Repositório** and provide a project name
+2. Click **New Repository** ("Novo Repositório") and provide a project name
 3. Confirm — the platform automatically provisions a GitHub repository with the standard template pre-configured:
    - Folder structure (`automations/`, `functions/`, `data-transformations/`)
    - TypeScript configuration (`tsconfig.json`)
@@ -14,7 +34,7 @@ Before writing any code, the project repository must be created via the Kruzer D
 4. Clone the provisioned repository and install dependencies:
 
 ```bash
-git clone https://github.com/your-org/project-name.git
+git clone <URL displayed on the platform after repository creation>
 cd project-name
 npm install
 ```
