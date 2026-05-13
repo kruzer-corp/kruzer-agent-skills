@@ -51,25 +51,25 @@ Run these steps in order. Do not skip any of them.
 
 If the output is `KRUZER_REPO_INVALID`, stop and tell the user. See `reference/platform-setup.md` — Step 0.
 
-**2. Install dependencies**
+**2. Install dependencies — REQUIRED before writing any file**
 
 ```bash
 npm install
 ```
 
-Run this every time before writing code. The `node_modules/` directory may be absent (fresh clone) or stale. Always install before editing — TypeScript compilation and local test runs depend on it.
+**Do not create or edit any `.ts` file before this command completes.** The `node_modules/` directory may be absent (fresh clone) or stale. TypeScript compilation and local test runs depend on it. Skipping this step causes type errors that are invisible during coding but fail at build time.
 
 ---
 
-## After Implementing
+## After Implementing — REQUIRED before reporting the task as done
 
-Once all files are written, **always** run the build to verify the TypeScript compiles:
+Once all files are written, run the build to verify the TypeScript compiles:
 
 ```bash
 npm run build
 ```
 
-A build failure means the code will also fail on the platform at deploy time. Fix all compilation errors before considering the task complete.
+**Do not report the task as complete until this command exits with code 0.** A build failure means the code will also fail on the platform at deploy time. Fix all compilation errors before finishing.
 
 ---
 
@@ -77,6 +77,8 @@ A build failure means the code will also fail on the platform at deploy time. Fi
 
 | Anti-pattern | Why it is wrong |
 |---|---|
+| Writing or editing any `.ts` file before running `npm install` | `node_modules/` may be absent or stale. Type errors are invisible during coding but surface at build time — wasting a full coding pass. |
+| Reporting the task as done without running `npm run build` | TypeScript may compile locally but fail on deploy. The task is not complete until the build exits with code 0. |
 | `import axios from "axios"` or `fetch(url)` in any file | All external HTTP calls must go through `RestDataSource` from `@kruzer/idk`. The platform handles auth, retry, and routing — bypassing it breaks multi-tenancy. |
 | Business logic in the automation file | The automation is a controller. Rules, validations, and transformations belong in the use case. |
 | A service layer between automation and use cases | There is no service layer in this architecture. Routing logic lives directly in the automation. If an automation grows too large, split it into multiple automations. |
