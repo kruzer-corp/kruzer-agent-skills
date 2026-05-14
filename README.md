@@ -4,6 +4,7 @@ A collection of skills composed as Claude Code plugins for building integrations
 
 - [Available Plugins](#available-plugins)
 - [Installation for Claude Code](#installation-for-claude-code)
+- [Usage with Other Agents](#usage-with-other-agents)
 - [Usage](#usage)
 - [Privacy](#privacy)
 
@@ -40,6 +41,36 @@ claude
 ```
 
 You should see the Kruzer plugin listed under the Installed tab.
+
+## Usage with Other Agents
+
+These skills can be used with any agent. The `/plugin` installation commands are specific to Claude Code, but the skill content — architecture patterns, canonical code examples, and reference documentation — can be integrated manually into any tool that supports project-level context or rules files.
+
+### Manual Installation
+
+Clone this repository and copy the desired skill directory into your project:
+
+```bash
+git clone https://github.com/kruzer-corp/kruzer-agent-skills.git
+```
+
+```bash
+cp -r kruzer-agent-skills/plugins/kruzer-devtools/skills/build-automation <destination>
+```
+
+### Cursor
+
+Copy the skill directory to `.cursor/rules/` in your project. Cursor loads all files in that directory as project-level rules.
+
+```bash
+cp -r kruzer-agent-skills/plugins/kruzer-devtools/skills/build-automation .cursor/rules/kruzer-build-automation
+```
+
+The `SKILL.md` file becomes the primary rule, and the files inside `reference/` are available for the agent to read on demand. To configure MCP servers (for `search_kruzer` and `query_docs_filesystem_kruzer`), add the server entries to `.cursor/mcp.json`.
+
+### OpenCode and Other Agents
+
+Copy the skill directory to the location your agent reads as project context. Most agents that support a project-level system prompt or rules directory will pick up the `SKILL.md` content automatically. For agents with MCP support, configure the MCP server entries from `.claude/settings.local.json` in your agent's equivalent MCP configuration file.
 
 ## Usage
 
